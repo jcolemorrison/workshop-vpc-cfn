@@ -26,6 +26,14 @@
       "Type": "AWS::EC2::VPC",
       "Properties": {
       }
+    },
+    "SecurityGroupExample": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupName": {
+          "Fn::Sub": "${ParamAuthorName}-my-security-group-${AWS::Region}"
+        }
+      }
     }
   },
   "Outputs": {
