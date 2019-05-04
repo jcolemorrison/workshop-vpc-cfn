@@ -359,6 +359,91 @@
         "SubnetId": { "Ref": "PublicSubnetC" },
         "RouteTableId": { "Ref": "PublicRouteTable" }
       }
+    },
+    "PrivateRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "Tags": [
+          { "Key": "Owner", "Value": { "Ref": "ParamAuthorName" } },
+          { "Key": "Name", "Value": { "Fn::Sub": "${AWS::StackName}-private-route-table" } }
+        ]
+      }
+    },
+    "NatGatewayEIP": {
+      "Type": "AWS::EC2::EIP",
+      "Condition": "CreateNatGateway",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "NatGateway": {
+      "Type": "AWS::EC2::NatGateway",
+      "Condition": "CreateNatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": ["NatGatewayEIP", "AllocationId"]
+        },
+        "SubnetId": { "Ref": "PublicSubnetA" },
+        "Tags": [
+          { "Key": "Owner", "Value": { "Ref": "ParamAuthorName" } },
+          { "Key": "Name", "Value": { "Fn::Sub": "${AWS::StackName}-nat-gw" } }
+        ]
+      }
+    },
+    "NatRoute": {
+      "Type": "AWS::EC2::Route",
+      "Condition": "CreateNatGateway",
+      "DependsOn": "NatGateway",
+      "Properties": {
+        "RouteTableId": { "Ref": "PrivateRouteTable" },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "NatGateway"
+        }
+      }
+    },
+    "RouteAssociationPrivateSubnetA": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "PrivateSubnetA" },
+        "RouteTableId": { "Ref": "PrivateRouteTable" }
+      }
+    },
+    "RouteAssociationPrivateSubnetB": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "PrivateSubnetB" },
+        "RouteTableId": { "Ref": "PrivateRouteTable" }
+      }
+    },
+    "RouteAssociationPrivateSubnetC": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "PrivateSubnetC" },
+        "RouteTableId": { "Ref": "PrivateRouteTable" }
+      }
+    },
+    "RouteAssociationDbSubnetA": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "DbSubnetA" },
+        "RouteTableId": { "Ref": "PrivateRouteTable" }
+      }
+    },
+    "RouteAssociationDbSubnetB": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "DbSubnetB" },
+        "RouteTableId": { "Ref": "PrivateRouteTable" }
+      }
+    },
+    "RouteAssociationDbSubnetC": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": { "Ref": "DbSubnetC" },
+        "RouteTableId": { "Ref": "PrivateRouteTable" }
+      }
     }
   },
   "Outputs": {
