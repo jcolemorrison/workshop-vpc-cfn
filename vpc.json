@@ -51,6 +51,256 @@
         "AmazonProvidedIpv6CidrBlock": true,
         "VpcId": { "Ref": "VPC" }
       }
+    },
+    "PublicSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.0.0/20"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": ["0", { "Fn::GetAZs": "" }]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Sub": "${AWS::StackName}-public-a" }
+          },
+          { "Key": "Owner", "Value": { "Ref": "ParamAuthorName" } }
+        ]
+      }
+    },
+    "PrivateSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.16.0/21"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-private-a"
+            }
+          },
+          { "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "DbSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.24.0/22"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "0",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-db-a"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "PublicSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.32.0/20"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-public-b"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "PrivateSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.48.0/21"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-private-b"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "DbSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.56.0/22"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-db-b"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "PublicSubnetC": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.64.0/20"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "2",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-public-c"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "PrivateSubnetC": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.80.0/21"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "2",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-private-c"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "DbSubnetC": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.88.0/22"
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "2",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-db-c"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
     }
   },
   "Outputs": {
