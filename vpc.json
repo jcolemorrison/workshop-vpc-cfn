@@ -14,6 +14,14 @@
       "Default": "true",
       "AllowedValues": ["true", "false"],
       "ConstraintDescription": "Whether to launch a NAT Gateway for the private subnets. true or false only."
+    },
+    "ParamVPCCidrRange": {
+      "Type": "Number",
+      "Default": 0,
+      "MinValue": 0,
+      "MaxValue": 255,
+      "Description": "The 'x' in 10.x.0.0/16.  Can be 0-255",
+      "ConstraintDescription": "Should be a number between 0-255"
     }
   },
   "Conditions": {
@@ -25,14 +33,23 @@
     "VPC": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.0.0/16"
+        },
+        "EnableDnsSupport": true,
+        "EnableDnsHostnames": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          { "Key": "Owner", "Value": { "Ref": "ParamAuthorName" } },
+          { "Key": "Name", "Value": { "Fn::Sub": "${AWS::StackName}-vpc" } }
+        ]
       }
     },
-    "SecurityGroupExample": {
-      "Type": "AWS::EC2::SecurityGroup",
+    "VPCIPv6CidrBlock": {
+      "Type": "AWS::EC2::VPCCidrBlock",
       "Properties": {
-        "GroupName": {
-          "Fn::Sub": "${ParamAuthorName}-my-security-group-${AWS::Region}"
-        }
+        "AmazonProvidedIpv6CidrBlock": true,
+        "VpcId": { "Ref": "VPC" }
       }
     }
   },
