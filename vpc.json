@@ -722,7 +722,12 @@
   "Outputs": {
     "VPCId": {
       "Description": "VPC Id",
-      "Value": { "Ref": "VPC" }
+      "Value": { "Ref": "VPC" },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-vpc-id"
+        }
+      }
     }
   }
 }
