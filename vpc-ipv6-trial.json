@@ -1,0 +1,214 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Production Ready VPC",
+  "Metadata": {
+    "Author": { "Ref": "ParamAuthorName" }
+  },
+  "Parameters": {
+    "ParamAuthorName": {
+      "Type": "String",
+      "Description": "Owner of the CFN Template."
+    },
+    "ParamNatGateway": {
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": ["true", "false"],
+      "ConstraintDescription": "Whether to launch a NAT Gateway for the private subnets. true or false only."
+    },
+    "ParamVPCCidrRange": {
+      "Type": "Number",
+      "Default": 0,
+      "MinValue": 0,
+      "MaxValue": 255,
+      "Description": "The 'x' in 10.x.0.0/16.  Can be 0-255",
+      "ConstraintDescription": "Should be a number between 0-255"
+    }
+  },
+  "Conditions": {
+    "CreateNatGateway": {
+      "Fn::Equals": [{ "Ref": "ParamNatGateway" }, "true"]
+    }
+  },
+  "Resources": {
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.0.0/16"
+        },
+        "EnableDnsSupport": true,
+        "EnableDnsHostnames": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          { "Key": "Owner", "Value": { "Ref": "ParamAuthorName" } },
+          { "Key": "Name", "Value": { "Fn::Sub": "${AWS::StackName}-vpc" } }
+        ]
+      }
+    },
+    "VPCIPv6CidrBlock": {
+      "Type": "AWS::EC2::VPCCidrBlock",
+      "DependsOn": "VPC",
+      "Properties": {
+        "AmazonProvidedIpv6CidrBlock": true,
+        "VpcId": { "Ref": "VPC" }
+      }
+    },
+    "PublicSubnetA": {
+      "Type": "AWS::EC2::Subnet",
+      "DependsOn": "VPCIPv6CidrBlock",
+      "Properties": {
+        "VpcId": { "Ref": "VPC" },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.0.0/20"
+        },
+        "Ipv6CidrBlock": { 
+          "Fn::Select" : [
+            0, 
+            {
+              "Fn::Cidr": [
+                { 
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::GetAtt": [ "VPC", "Ipv6CidrBlocks" ]
+                    }
+                  ]
+                },
+                256,
+                64 
+              ]
+            }
+          ]
+        },
+        "AvailabilityZone": {
+          "Fn::Select": ["0", { "Fn::GetAZs": "" }]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Sub": "${AWS::StackName}-public-a" }
+          },
+          { "Key": "Owner", "Value": { "Ref": "ParamAuthorName" } }
+        ]
+      }
+    },
+    "PublicSubnetB": {
+      "Type": "AWS::EC2::Subnet",
+      "DependsOn": "VPCIPv6CidrBlock",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.32.0/20"
+        },
+        "Ipv6CidrBlock": { 
+          "Fn::Select" : [
+            1, 
+            {
+              "Fn::Cidr": [
+                { 
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::GetAtt": [ "VPC", "Ipv6CidrBlocks" ]
+                    }
+                  ]
+                },
+                256,
+                64 
+              ]
+            }
+          ]
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "1",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-public-b"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    },
+    "PublicSubnetC": {
+      "Type": "AWS::EC2::Subnet",
+      "DependsOn": "VPCIPv6CidrBlock",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPC"
+        },
+        "CidrBlock": {
+          "Fn::Sub": "10.${ParamVPCCidrRange}.64.0/20"
+        },
+        "Ipv6CidrBlock": { 
+          "Fn::Select" : [
+            2, 
+            {
+              "Fn::Cidr": [
+                { 
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::GetAtt": [ "VPC", "Ipv6CidrBlocks" ]
+                    }
+                  ]
+                },
+                256,
+                64 
+              ]
+            }
+          ]
+        },
+        "AvailabilityZone": {
+          "Fn::Select": [
+            "2",
+            { "Fn::GetAZs": "" }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-public-c"
+            }
+          },
+          {
+            "Key": "Owner",
+            "Value": { "Ref": "ParamAuthorName" }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "VPCId": {
+      "Description": "VPC Id",
+      "Value": { "Ref": "VPC" },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-vpc-id"
+        }
+      }
+    },
+    "VPCipv6": {
+      "Description": "VPC IPV6",
+      "Value": {
+        "Fn::Select": [
+          0,
+          { "Fn::GetAtt": ["VPC", "Ipv6CidrBlocks"] }
+        ]
+      }
+    }
+  }
+}
